@@ -21,3 +21,35 @@ typedef struct {
 
 extern team_t team;
 
+#define WSIZE	4	// word와 헤더, 풋터 사이즈.
+#define DSIZE	8	 // 더블 워드 사이즈.
+#define CHUNKSIZE (1<<12)	// 초기 가용 블록과 힙 확장을 위한 기본 크기.
+
+#define MAX(x, y) ((x) >(y)? (x) : (y))
+
+#define PACK(size, alloc) ((size) | (alloc)) 
+// 크기와 할당 비트를 통합. 헤더와 풋터에 저장할 수 있는 값을 리턴함.
+
+#define GET(p)	(*(unsigned int *)(p)) // 인자 p가 참조하는 워드를 읽어서 리턴. 
+// p가 가리키는 메모리 위치에서 4바이트 워드를 읽어서 리턴.
+#define PUT(p, val) (*(unsigned int *)(p) = (val)) 
+// 인자 p가 가리키는 워드에 val을 저장.
+
+#define GET_SIZE(p)	(GET(p) & ~0x7) // 주소 p에 있는 헤더 또는 풋터의 size를 리턴.
+#define GET_ALLOC(p) (GET(p) & 0x1) // 주소 p에 있는 헤더 또는 풋터의 할당 비트를 리턴.
+
+// bp는 블록 포인터.
+#define HDRP(bp)	((char *)(bp) - WSIZE) // 헤더를 가리키는 포인터를 리턴.
+#define FTRP(bp) 	((char *)(bp) + GET_SIZE(HDRP(bp)) - DSIZE) 
+// 풋터를 가리키는 포인터를 리턴.
+
+#define NEXT_BLKP(bp)	((char *)(bp) + GET_SIZE(((char *)(bp) - WSIZE))) 
+// 다음 블록 포인터를 리턴.
+#define PREV_BLKP(bp) 	((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE))) 
+// 이전 블록 포인터를 리턴.
+
+
+// static void *find_fit(size_t asize);
+// static void place(void *bp, size_t asize);
+// static void *extend_heap(size_t words);
+// static void *coalesce(void *bp);
