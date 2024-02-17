@@ -84,7 +84,8 @@ Tiny synthetic tracefiles for debugging
 Traces generated from real programs.
 
 * {binary,binary2}-bal.rep
-
+// 큰 값과 작은 값을 번갈아 할당하고, 작은건 2의 거듭제곱이지만 큰건 2의 거듭제곱이 아님.
+// 단순한 알고리즘이 우세할수 있다. first-fit이면 충분하기때문.
 The allocation pattern is to alternatively allocate a small-sized
 chunk of memory and a large-sized chunk. The small-sized chunks
 (either 16 or 64 ) are deliberately set to be power of 2 while the
@@ -93,7 +94,9 @@ buddy algorithms. However, a simple-minded algorithm might prevail in
 this scenario because a first-fit scheme will be good enough.
 
 * coalescing-bal.rep
-
+// 동일한 크기 두개를 반복적으로 할당하고 해제.
+// 그 후 두 배 큰 크기를 할당하고 해제.
+// 트리 기반 또는 분할 fit이 유리하다(헤더가 없거나 풋터가 오버헤드인..)
 Repeatedly allocate two equal-sized chunks (4095 in size) and release
 them, and then immediately allocate and free a chunk twice as big
 (8190). This tests if the students' algorithm ever really releases
@@ -102,13 +105,15 @@ tree-based or segrated fits algorithms where there is no header or
 footer overhead.
 
 * {random,random2}-bal.rep
-	
+정확성, 견고성을 테스트 하는 무작위 테스트.
 Random allocate and free requesets that simply test the correctness
 and robustness of the algorithm.
 
 
 * {realloc,realloc2}-bal.rep
-	
+이전에 할당된 블록을 재할당. 
+항상 새로운 블록 자체를 재할당하면 효율이 낮을 것이다.
+일정량은 내부 조각에서 할당하는게 유리할 것.
 Reallocate previously allocated blocks interleaved by other allocation
 request. The purpose is to test whether a certain amount of internal
 fragments are allocated or not. Naive realloc implementations that

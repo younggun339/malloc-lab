@@ -49,7 +49,8 @@ extern team_t team;
 // 이전 블록 포인터를 리턴.
 
 
-// static void *find_fit(size_t asize);
-// static void place(void *bp, size_t asize);
-// static void *extend_heap(size_t words);
-// static void *coalesce(void *bp);
+// #define PREV_FREE(bp)    GET(((char *)(bp) + WSIZE))    //이어진 이전 free 리스트의 주소를 가져오기
+#define NEXT_FREE(bp)    GET(((char *)(bp) + WSIZE)) //이어진 이후 free 리스트 주소를 가져오기.
+
+// #define FREE_HEAD(bp)   ((char *)(bp) - DSIZE)
+
