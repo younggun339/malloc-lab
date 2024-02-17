@@ -52,5 +52,6 @@ extern team_t team;
 // #define PREV_FREE(bp)    GET(((char *)(bp) + WSIZE))    //이어진 이전 free 리스트의 주소를 가져오기
 #define NEXT_FREE(bp)    GET(((char *)(bp) + WSIZE)) //이어진 이후 free 리스트 주소를 가져오기.
 
-// #define FREE_HEAD(bp)   ((char *)(bp) - DSIZE)
+#define PUT_ADDR(p, val) (*(unsigned int*)((void*)(p)) = (val))
+
 
