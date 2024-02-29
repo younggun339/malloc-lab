@@ -32,8 +32,8 @@ void mem_init(void)
 
     mem_max_addr = mem_start_brk + MAX_HEAP;  /* max legal heap address */
     mem_brk = mem_start_brk;   
-    //printf("mem_init 종료!\n");
-    //printf("----------\n");               /* heap is empty initially */
+    // printf("mem_init 종료!\n");
+    // printf("----------\n");               /* heap is empty initially */
 }
 
 /* 
@@ -60,7 +60,7 @@ void mem_reset_brk()
 void *mem_sbrk(int incr) 
 {
     char *old_brk = mem_brk;
-    // //printf("현재 brk는 %p.\n", mem_brk);
+    // printf("현재 brk는 %p.\n", mem_brk);
     
     if ( (incr < 0) || ((mem_brk + incr) > mem_max_addr)) {
 	errno = ENOMEM;
@@ -68,10 +68,10 @@ void *mem_sbrk(int incr)
 	return (void *)-1;
     }
     mem_brk += incr;
-    //printf("%d 만큼 증가시켜서 brk는 %p로 이동했당.\n", incr, mem_brk);
-    //printf("%p 라는 예전 포인터를 돌려주마.\n", old_brk);
-    //printf("mem_sbrk 종료!\n");
-    //printf("----------\n");
+    // printf("%d 만큼 증가시켜서 brk는 %p로 이동했당.\n", incr, mem_brk);
+    // printf("%p 라는 예전 포인터를 돌려주마.\n", old_brk);
+    // printf("mem_sbrk 종료!\n");
+    // printf("----------\n");
     return (void *)old_brk;
 }
 

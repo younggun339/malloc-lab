@@ -45,7 +45,7 @@ team_t team = {
 #define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
 
 static char *heap_listp = 0;
-// static char *tmp_ptr = NULL;
+static char *tmp_ptr = NULL;
 
 
 static void place(void *bp, size_t asize){
@@ -145,7 +145,7 @@ static void *extend_heap(size_t words)
     PUT(FTRP(bp), PACK(size,0)); // free 풋터
     PUT(HDRP(NEXT_BLKP(bp)),PACK(0,1)); // 새로운 에필로그 헤더
     
-    // tmp_ptr = bp;
+    tmp_ptr = bp;
     //printf("extend_heap 종료!\n");
     //printf("----------\n");
     //앞선 블록이 free라면 연결해주겠다..
@@ -185,13 +185,29 @@ int mm_init(void)
 
 }
 
-// first fit
+
+// next fit
 static void *find_fit(size_t asize){
     //printf("%d 만한 적당한 크기가 있는지 확인해보겠습니다.\n", asize);
 
-    void *bp;
+    void *bp = tmp_ptr;
 
-    for (bp = heap_listp; GET_SIZE(HDRP(bp)) > 0; bp = NEXT_BLKP(bp))
+    // 이전에 받은 포인터에서부터 이동.
+
+    for (bp = tmp_ptr; GET_SIZE(HDRP(bp)) > 0; bp = NEXT_BLKP(bp))
+    {
+        //printf("현재 %p가 위치인데...\n", bp);
+        //printf("%d 크기만큼의 블록이긴한데...\n",GET_SIZE(HDRP(bp)));
+        if(!GET_ALLOC(HDRP(bp)) && (asize <= GET_SIZE(HDRP(bp)))){
+            //printf("할당 받을수도 있을거같고, 내가 필요한 크기보다 큰데?\n");
+            //printf("%p를 반환해야징.\n",bp);
+            return bp;
+        }
+        //printf("음, 다음 블록을 봐야겠군.\n");
+    }
+
+    // 못 찾으면 앞에 있을 수도 있으니 순회. 
+    for (bp = heap_listp+WSIZE; GET_SIZE(HDRP(bp)) > 0; bp = NEXT_BLKP(bp))
     {
         //printf("현재 %p가 위치인데...\n", bp);
         //printf("%d 크기만큼의 블록이긴한데...\n",GET_SIZE(HDRP(bp)));
@@ -205,7 +221,31 @@ static void *find_fit(size_t asize){
 
     //printf("포기! NULL입니다!\n");
     return NULL;
+
 }
+
+
+// // first fit
+// static void *find_fit(size_t asize){
+//     //printf("%d 만한 적당한 크기가 있는지 확인해보겠습니다.\n", asize);
+
+//     void *bp;
+
+//     for (bp = heap_listp; GET_SIZE(HDRP(bp)) > 0; bp = NEXT_BLKP(bp))
+//     {
+//         //printf("현재 %p가 위치인데...\n", bp);
+//         //printf("%d 크기만큼의 블록이긴한데...\n",GET_SIZE(HDRP(bp)));
+//         if(!GET_ALLOC(HDRP(bp)) && (asize <= GET_SIZE(HDRP(bp)))){
+//             //printf("할당 받을수도 있을거같고, 내가 필요한 크기보다 큰데?\n");
+//             //printf("%p를 반환해야징.\n",bp);
+//             return bp;
+//         }
+//         //printf("음, 다음 블록을 봐야겠군.\n");
+//     }
+
+//     //printf("포기! NULL입니다!\n");
+//     return NULL;
+// }
 
 
 void *mm_malloc(size_t size)
@@ -234,7 +274,7 @@ void *mm_malloc(size_t size)
     	place(bp, asize);
         //printf("malloc 종료!\n");
         //printf("----------\n");
-        // tmp_ptr = bp;
+        tmp_ptr = bp;
         return bp;}
         
     // 딱 맞는거 못 찾았다면 메모리 더 갖고 오기.    
@@ -246,7 +286,7 @@ void *mm_malloc(size_t size)
     	return NULL;
     }
     place(bp, asize);
-    // tmp_ptr = bp;
+    tmp_ptr = bp;
     //printf("malloc 종료!\n");
     //printf("----------\n");
     return bp;
